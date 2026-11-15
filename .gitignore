@@ -1,0 +1,22 @@
+# Match data -- licensed separately, not redistributable
+*.txt
+*.xml
+*.mp4
+*.zip
+*homography*.csv
+
+# Keep the submission and GT
+!BAR-ATH_possession_gt_public.csv
+!submission.csv
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# eval outputs
+eval/results/
+eval/reports/
+eval/scoreboard.csv
+eval/__pycache__/
