@@ -1,22 +1,22 @@
-# Match data -- licensed separately, not redistributable
-*.txt
-*.xml
+# Match data -- licensed for the competition only, never committed
+data/
 *.mp4
 *.zip
+*_atd.txt
+*_atd.xml
+*_smart_tagging.xml
 *homography*.csv
 
-# Keep the submission and GT
-!BAR-ATH_possession_gt_public.csv
-!submission.csv
-
-# Python cache
+# Python
 __pycache__/
 *.pyc
 *.pyo
 .pytest_cache/
 
-# eval outputs
+# Scorer outputs
 eval/results/
 eval/reports/
 eval/scoreboard.csv
-eval/__pycache__/
+
+# Local notes
+SESSION_SUMMARY.md
