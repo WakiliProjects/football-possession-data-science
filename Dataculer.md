@@ -9,9 +9,9 @@
 
 ### What we built
 
-A three-state hidden Markov model (Home, Away, and Dead) decoded over each half of the match,
+A three-state hidden Markov model (Home, Away and Dead) decoded over each half of the match,
 followed by five rules that apply the labelling conventions of `CHALLENGE.md`. The whole
-pipeline is `solve.py`, needs only numpy and pandas, runs in about 8 seconds, and uses no
+pipeline is `solve.py`, needs only numpy and pandas, runs in about 8 seconds and uses no
 random numbers.
 
 ```
@@ -30,13 +30,13 @@ a per-frame vote. Three facts about the data shaped the model.
 **1. The ball is not missing at random.** Inside the graded frames the ball track has only 150
 gaps, and 133 of them are longer than 4 seconds. The tracker bridges short losses itself, so
 what remains are long holes, and most are stoppages: the ball is in a player's hands, off the
-pitch, or outside the camera's interest. A gap is therefore evidence about dead or alive, not
+pitch or outside the camera's interest. A gap is therefore evidence about dead or alive, not
 about which team.
 
 **2. Half of the dead time has a visible ball.** In the public window, two of the four stoppages
-have the ball tracked throughout as it rolls away, is carried back, and is placed. A "no ball
+have the ball tracked throughout as it rolls away, is carried back and is placed. A "no ball
 means dead" rule, which was our first version and the starter baseline, cannot see these. They
-are recognisable from the combination of signals: nobody near a slow ball, players walking, and
+are recognisable from the combination of signals: nobody near a slow ball, players walking and
 a ball lying still.
 
 **3. Goalkeeper tracks carry the wrong team 11% of the time.** The two track slots that live next
@@ -73,7 +73,7 @@ table. EM settles on a team in possession being in clear contact with the ball 3
 and in contact under pressure 10.5% of the time, while its opponent touches it 2.3% of the time.
 
 The transition matrix is not fitted. It is set from three durations: a mean possession of 14 s
-(the figure published in the README), a mean stoppage of 20 s, and 70% of possessions ending in a
+(the figure published in the README), a mean stoppage of 20 s and 70% of possessions ending in a
 turnover rather than a stoppage.
 
 ### Features
@@ -81,10 +81,10 @@ turnover rather than a stoppage.
 Each 0.2 s step emits two discrete features.
 
 - **Contact by ball speed** (30 values). Contact is one of: nobody within 1.5 m, nobody within
-  6 m, home clear, home under pressure (an opponent within 3 m), away under pressure, or away
-  clear. Ball speed is binned at 1, 3, 7, and 12 m/s. The pairing matters, because a ball far
+  6 m, home clear, home under pressure (an opponent within 3 m), away under pressure or away
+  clear. Ball speed is binned at 1, 3, 7 and 12 m/s. The pairing matters, because a ball far
   from everyone is a long pass when fast and a stoppage when slow.
-- **Median player speed** (6 values, binned at 0.8, 1.2, 1.6, 2.2, and 3.0 m/s).
+- **Median player speed** (6 values, binned at 0.8, 1.2, 1.6, 2.2 and 3.0 m/s).
 
 When the ball is not tracked the first feature contributes nothing, so the state is carried by
 player speed and by the transition matrix. Viterbi runs on integer scores, and the tables are
@@ -92,20 +92,20 @@ rounded to four decimals first, so the output does not depend on floating-point 
 
 ---
 
-## 2. Assets used, and how
+## 2. Assets used and how
 
 | Asset | Use |
 |---|---|
-| `BAR-ATH_tactical_atd.txt` | The input. Ball position, player positions, and speeds for all 46 track slots. |
+| `BAR-ATH_tactical_atd.txt` | The input. Ball position, player positions and speeds for all 46 track slots. |
 | `BAR-ATH_tactical_atd.xml` | Maps each track slot to a team. |
 | `BAR-ATH_tactical_smart_tagging.xml` | Kick-offs only (6 tags), each accepted only if the ball is tracked within 8 m of the centre spot in the tag window. Five are confirmed. The sixth, tagged at frame 62012 with no ball near the centre, is ignored. A `GOALS` tag ending at a confirmed kick-off marks the time between goal and kick-off as dead. |
-| `eval/gt/BAR-ATH_possession_gt_public.csv` | Verification only. We used it to align frames, to read the labelling convention so we understood what counts as possession, and to run the format and score checks in section 5. No table, constant, or rule was fitted, tuned, or searched against it, and the model never sees it. |
+| `eval/gt/BAR-ATH_possession_gt_public.csv` | Verification only. We used it to align frames, to read the labelling convention so we understood what counts as possession and to run the format and score checks in section 5. No table, constant or rule was fitted, tuned or searched against it, and the model never sees it. |
 
 **Tried and dropped**
 
 | What | Why it was dropped |
 |---|---|
-| Smart Tagging team tags (Progression, Build Up, Transitions, and so on) as evidence for the team in possession | In the public window these tags name the team in possession on 76% of the live frames they cover (73% for Progression). Contact evidence alone is right on 92% of live frames there, so the tags would add noise rather than information. |
+| Smart Tagging team tags (Progression, Build Up, Transitions and so on) as evidence for the team in possession | In the public window these tags name the team in possession on 76% of the live frames they cover (73% for Progression). Contact evidence alone is right on 92% of live frames there, so the tags would add noise rather than information. |
 | Smart Tagging set-piece windows as dead-ball evidence | Every window is exactly 35 s, the restart falls anywhere inside it, and only 59 set pieces are tagged against the 114 stoppages we find. We use them as an independent check instead (section 5). In our first version these windows were the dead-ball mask, and that was replaced. |
 | Unconstrained EM on all tables | It converges to the wrong states. Dead becomes "ball not tracked" in one variant and "players slow" in another, with 65% of frames dead. The anchors prevent this. |
 | "Ball not tracked for 10 s is dead" (first version) | Misses the 53 gaps of 5 to 10 s, and every stoppage with a visible ball. |
@@ -116,7 +116,7 @@ rounded to four decimals first, so the output does not depend on floating-point 
 | Video | Not used. We never checked the output against the video. |
 | The ball's third column in the ATD file | Present on 10% of rows, mostly before kick-off, and uncorrelated with ball speed. Ignored. |
 
-No external data, pre-trained model, or LLM is part of the pipeline. No frame was labelled by
+No external data, pre-trained model or LLM is part of the pipeline. No frame was labelled by
 hand.
 
 ---
@@ -131,7 +131,7 @@ because under pressure the tracked distances cannot tell the carrier from the ch
 and Away, so the model has no reason to switch, and the team that last had the ball keeps it. This
 is the convention in `CHALLENGE.md`.
 
-**Challenges, deflections, and single touches.** A change of possession needs sustained evidence.
+**Challenges, deflections and single touches.** A change of possession needs sustained evidence.
 With the fitted tables, roughly two 0.2 s steps of clear opponent contact outweigh the cost of a
 switch, and more when the contact is pressed. In addition, a possession shorter than 1 s that sits
 inside the other team's possession is treated as a single touch and removed.
@@ -140,8 +140,8 @@ inside the other team's possession is treated as a single touch and removed.
 with the ball after the old team's last contact, which is the reception rather than the pass.
 
 **Dead ball.** A stoppage is what the HMM decodes as Dead: mostly the anchors (ball out, a long
-gap with walking players, or a ball at rest) extended to the frames around them where the ball is
-slow, the ball is far from players, and the players are walking. Dead-ball ownership is never
+gap with walking players or a ball at rest) extended to the frames around them where the ball is
+slow, the ball is far from players and the players are walking. Dead-ball ownership is never
 labelled. Two rules clean the result:
 
 - a stoppage shorter than 4 s that no anchor supports is discarded, since a high ball that
@@ -150,7 +150,7 @@ labelled. Two rules clean the result:
   walking the ball to the corner flag is not a possession.
 
 **Restarts.** Play resumes when the ball leaves its resting spot. Within 3 s before the decoded
-restart we find the last frame with the ball under 1.5 m/s, and move the restart to the first
+restart we find the last frame with the ball under 1.5 m/s and move the restart to the first
 frame after it above 3 m/s. If the ball only reappears at the restart, as with most throw-ins,
 the decoded time stands. The team that restarts is whichever team the model sees in contact
 first, and it is not taken from the tags.
@@ -159,7 +159,7 @@ first, and it is not taken from the tags.
 the centre spot. Everything from the start of the second half to its kick-off is Dead (the
 decoded kick-off is frame 113743). The first half is treated as live from its first graded frame.
 
-**Ungraded frames** (before the match, at half-time, and after the final whistle) are written as
+**Ungraded frames** (before the match, at half-time and after the final whistle) are written as
 `D`. We never write `X`, because the model always has a best guess, and an abstention is worth no
 more than repeating the previous label.
 
@@ -168,7 +168,7 @@ more than repeating the previous label.
 ## 4. Limitations
 
 **Short possessions.** On the public window the ground truth has 17 possessions, and we report 12.
-Of the six we fail to match, four are under 3.6 s (19, 33, 71, and 90 frames), and the tracking
+Of the six we fail to match, four are under 3.6 s (19, 33, 71 and 90 frames), and the tracking
 does not separate them from touches the ground truth ignores: a 7-frame home touch counts as a
 possession at frame 15358, while an 18-frame one at 15272 does not. We chose not to chase them.
 Across the match this costs recall on brief possessions and merges their neighbours.
@@ -185,8 +185,7 @@ track ends. We did not find a reliable way to detect this without the video.
 **Stoppages with no anchor.** A foul followed by a quick free kick, with the ball tracked and
 moving the whole time, leaves little to see. In the other direction, a goalkeeper holding the ball
 while his track is lost looks like a ball lying far from everyone. The start of a stoppage is
-located less precisely than its end: in the public window the four starts are off by 2, 11, 21,
-and 75 frames, and the four restarts by 2, 9, 17, and 34.
+located less precisely than its end: in the public window the four starts are off by 2, 11, 21 and 75 frames, and the four restarts by 2, 9, 17 and 34.
 
 **Slow restarts.** After a short goal kick or a back-pass restart, the players are still walking
 and the ball is slow, so the model can stay in Dead one pass too long. This is the 34-frame error
@@ -224,7 +223,7 @@ restart. Counting a Dead-to-alive transition between 10 s before the tag window 
 output has one for 53 of the 59 set pieces, and our first version had 42.
 
 **Full-match output.** 235 possessions (mean 13.3 s) and 114 stoppages. Graded frames are 32%
-Home, 17% Away, and 51% Dead. That is about 52 minutes of ball in play out of 106 graded, and a
+Home, 17% Away and 51% Dead. That is about 52 minutes of ball in play out of 106 graded, and a
 66 to 34 split of live time.
 
 **Sensitivity.** Each constant was changed on its own and the pipeline re-run. Agreement is the
@@ -270,8 +269,8 @@ sha256 d3739f197260885a822df48d4baab29545a7eb9ed739e5552541204a963c733c
 OK    Dataculer.csv   199319 rows, frame 0..199318
 ```
 
-We obtained this hash on two machines: Linux with Python 3.13, numpy 2.5.3, and pandas 3.0.5, and
-Linux with Python 3.10, numpy 2.2.6, and pandas 2.3.3.
+We obtained this hash on two machines: Linux with Python 3.13, numpy 2.5.3 and pandas 3.0.5, and
+Linux with Python 3.10, numpy 2.2.6 and pandas 2.3.3.
 
-Files read: `BAR-ATH_tactical_atd.txt`, `BAR-ATH_tactical_atd.xml`, and
+Files read: `BAR-ATH_tactical_atd.txt`, `BAR-ATH_tactical_atd.xml` and
 `BAR-ATH_tactical_smart_tagging.xml`. Nothing else from the bundle is needed.

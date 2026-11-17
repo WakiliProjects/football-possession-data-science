@@ -43,7 +43,7 @@ data/tactical/BAR-ATH_tactical_atd.xml
 data/tactical/BAR-ATH_tactical_smart_tagging.xml
 ```
 
-`solve.py` also finds them in `data/`, next to `solve.py`, under `$MTAH_DATA_DIR`, or wherever
+`solve.py` also finds them in `data/`, next to `solve.py`, under `$MTAH_DATA_DIR` or wherever
 `--data-dir` points. The video, the homography and the broadcast files are not used.
 
 ## Regenerate the submission
