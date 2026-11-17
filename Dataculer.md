@@ -72,9 +72,10 @@ forward-backward over the full match, under one constraint, that swapping the te
 table. EM settles on a team in possession being in clear contact with the ball 33% of the time
 and in contact under pressure 10.5% of the time, while its opponent touches it 2.3% of the time.
 
-The transition matrix is not fitted. It is set from three durations: a mean possession of 14 s
-(the figure published in the README), a mean stoppage of 20 s and 70% of possessions ending in a
-turnover rather than a stoppage.
+The transition matrix is not fitted. It is set from three round priors chosen in advance from
+general football knowledge, not from this match: a possession of about 10 s, a stoppage of about
+20 s and most possessions (about 70%) ending in a turnover rather than a stoppage. Section 5 shows
+the output does not change across a wide range of all three.
 
 ### Features
 
@@ -99,7 +100,7 @@ rounded to four decimals first, so the output does not depend on floating-point 
 | `BAR-ATH_tactical_atd.txt` | The input. Ball position, player positions and speeds for all 46 track slots. |
 | `BAR-ATH_tactical_atd.xml` | Maps each track slot to a team. |
 | `BAR-ATH_tactical_smart_tagging.xml` | Kick-offs only (6 tags), each accepted only if the ball is tracked within 8 m of the centre spot in the tag window. Five are confirmed. The sixth, tagged at frame 62012 with no ball near the centre, is ignored. A `GOALS` tag ending at a confirmed kick-off marks the time between goal and kick-off as dead. |
-| `eval/gt/BAR-ATH_possession_gt_public.csv` | Verification only. We used it to align frames, to read the labelling convention so we understood what counts as possession and to run the format and score checks in section 5. No table, constant or rule was fitted, tuned or searched against it, and the model never sees it. |
+| `eval/gt/BAR-ATH_possession_gt_public.csv` | Verification only. We used it to align frames, to read the labelling convention so we understood what counts as possession and to run the format and score checks in section 5. No table, constant or rule was fitted, tuned or searched against it. `Dataculer.csv` is produced from the tracking and tagging alone, and the ground-truth file is read only by the optional `--score` check. |
 
 **Tried and dropped**
 
@@ -222,7 +223,7 @@ not use them, apart from kick-offs, so they can test it, since a tagged set piec
 restart. Counting a Dead-to-alive transition between 10 s before the tag window and its end, our
 output has one for 53 of the 59 set pieces, and our first version had 42.
 
-**Full-match output.** 235 possessions (mean 13.3 s) and 114 stoppages. Graded frames are 32%
+**Full-match output.** 241 possessions (mean 13.0 s) and 114 stoppages. Graded frames are 33%
 Home, 17% Away and 51% Dead. That is about 52 minutes of ball in play out of 106 graded, and a
 66 to 34 split of live time.
 
@@ -232,20 +233,20 @@ spellF1 of the variant scored against the submitted file, over the full match.
 
 | Change | Possessions | Stoppages | Agreement | Self-spellF1 |
 |---|---|---|---|---|
-| submitted | 235 | 114 | 1.000 | 1.000 |
-| decision step 4 / 6 / 8 frames (5) | 261 / 225 / 203 | 115 / 110 / 110 | 0.981 / 0.983 / 0.974 | 0.89 / 0.92 / 0.87 |
-| contact radius 1.2 / 1.8 m (1.5) | 223 / 265 | 114 / 112 | 0.981 / 0.983 | 0.92 / 0.88 |
-| pressure radius 2.5 / 4 m (3) | 238 / 236 | 113 / 111 | 0.996 / 0.997 | 0.98 / 0.98 |
-| loose-ball distance 5 / 8 m (6) | 236 / 232 | 114 / 114 | 0.996 / 0.995 | 0.99 / 0.98 |
-| walking speed 1.7 / 2.3 m/s (2.0) | 233 / 239 | 112 / 116 | 0.995 / 0.992 | 0.99 / 0.97 |
-| stoppage gap 3 / 6 s (4) | 235 / 233 | 114 / 110 | 1.000 / 0.995 | 1.00 / 0.99 |
-| ball-out margin 0.5 / 2 m (1) | 236 / 234 | 116 / 110 | 0.997 / 0.993 | 0.99 / 0.98 |
-| mean possession 10 / 20 s (14) | 241 / 233 | 114 / 114 | 0.999 / 0.999 | 0.98 / 0.99 |
-| mean stoppage 15 / 30 s (20) | 235 / 235 | 114 / 114 | 1.000 / 1.000 | 1.00 / 1.00 |
-| turnover share 0.6 / 0.8 (0.7) | 235 / 235 | 114 / 114 | 1.000 / 1.000 | 1.00 / 1.00 |
-| shortest stoppage 3 / 5 s (4) | 239 / 232 | 122 / 110 | 0.995 / 0.997 | 0.98 / 0.99 |
-| single-touch rule off / 1.5 s (1) | 253 / 225 | 114 / 114 | 0.997 / 0.999 | 0.96 / 0.98 |
-| table pseudo-count 1 / 20 (5) | 248 / 220 | 113 / 114 | 0.993 / 0.992 | 0.95 / 0.96 |
+| submitted | 241 | 114 | 1.000 | 1.000 |
+| decision step 4 / 6 / 8 frames (5) | 263 / 231 / 208 | 114 / 111 / 110 | 0.979 / 0.980 / 0.977 | 0.89 / 0.90 / 0.87 |
+| contact radius 1.2 / 1.8 m (1.5) | 226 / 277 | 114 / 112 | 0.980 / 0.980 | 0.92 / 0.87 |
+| pressure radius 2.5 / 4 m (3) | 243 / 248 | 113 / 111 | 0.996 / 0.990 | 0.97 / 0.94 |
+| loose-ball distance 5 / 8 m (6) | 242 / 240 | 114 / 114 | 0.996 / 0.995 | 0.99 / 0.98 |
+| walking speed 1.7 / 2.3 m/s (2.0) | 239 / 245 | 112 / 116 | 0.995 / 0.992 | 0.99 / 0.97 |
+| stoppage gap 3 / 6 s (4) | 241 / 238 | 114 / 110 | 1.000 / 0.994 | 1.00 / 0.99 |
+| ball-out margin 0.5 / 2 m (1) | 241 / 240 | 115 / 109 | 0.997 / 0.993 | 0.99 / 0.97 |
+| mean possession 8 / 16 s (10) | 251 / 235 | 114 / 114 | 0.995 / 0.999 | 0.96 / 0.98 |
+| mean stoppage 15 / 30 s (20) | 241 / 241 | 114 / 114 | 1.000 / 1.000 | 1.00 / 1.00 |
+| turnover share 0.6 / 0.8 (0.7) | 237 / 249 | 114 / 114 | 0.999 / 0.996 | 0.99 / 0.97 |
+| shortest stoppage 3 / 5 s (4) | 245 / 238 | 122 / 110 | 0.995 / 0.997 | 0.98 / 0.98 |
+| single-touch rule off / 1.5 s (1) | 263 / 229 | 114 / 114 | 0.997 / 0.998 | 0.95 / 0.97 |
+| table pseudo-count 1 / 20 (5) | 255 / 228 | 113 / 114 | 0.992 / 0.993 | 0.95 / 0.96 |
 
 The output depends mostly on two choices, the decision step and the contact radius, and even
 there at least 97% of frames keep their label.
@@ -265,7 +266,7 @@ cd eval && python validate_submission.py ../Dataculer.csv
 Expected:
 
 ```
-sha256 d3739f197260885a822df48d4baab29545a7eb9ed739e5552541204a963c733c
+sha256 4c62badea9c381ccb0df958dc8aa691ac59eddbace3dc4161ae7ff752a9d0d37
 OK    Dataculer.csv   199319 rows, frame 0..199318
 ```
 

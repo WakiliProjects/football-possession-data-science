@@ -78,9 +78,11 @@ CFG = dict(
     prior=5.0,        # Dirichlet pseudo-count for every table cell
     # --- HMM ----------------------------------------------------------------
     blk=5,            # fr  decision step (0.2 s)
-    spell_s=14.0,     # s   mean possession length (README: 17 possessions, 14.2 s)
-    switch_frac=0.7,  # share of possessions that end in a turnover rather than a stoppage
-    dead_s=20.0,      # s   mean stoppage length
+    spell_s=10.0,     # s   round a-priori prior for how long a team keeps the ball
+    #                       (general football knowledge, NOT this match); section 5: output
+    #                       is identical for any value from 8 to 16 s
+    switch_frac=0.7,  # a-priori prior: most possessions end in a turnover, not a stoppage
+    dead_s=20.0,      # s   round a-priori prior for stoppage length (not from this match)
     em_iters=15,
     round_dec=4,      # tables are rounded before decoding (reproducibility)
     # --- kick-offs (Smart Tagging, confirmed by the ball) -------------------

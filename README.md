@@ -56,7 +56,7 @@ This writes `Dataculer.csv` and prints its SHA-256. The pipeline has no random c
 decodes with integer arithmetic, so the file is the same on every run:
 
 ```
-sha256 d3739f197260885a822df48d4baab29545a7eb9ed739e5552541204a963c733c
+sha256 4c62badea9c381ccb0df958dc8aa691ac59eddbace3dc4161ae7ff752a9d0d37
 ```
 
 Runtime is about 10 seconds; peak memory is about 1.4 GB.
