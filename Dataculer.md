@@ -35,7 +35,7 @@ about which team.
 
 **2. Half of the dead time has a visible ball.** In the public window, two of the four stoppages
 have the ball tracked throughout as it rolls away, is carried back and is placed. A "no ball
-means dead" rule, which was our first version and the starter baseline, cannot see these. They
+means dead" rule, like the starter baseline, cannot see these. They
 are recognisable from the combination of signals: nobody near a slow ball, players walking and
 a ball lying still.
 
@@ -107,11 +107,8 @@ rounded to four decimals first, so the output does not depend on floating-point 
 | What | Why it was dropped |
 |---|---|
 | Smart Tagging team tags (Progression, Build Up, Transitions and so on) as evidence for the team in possession | In the public window these tags name the team in possession on 76% of the live frames they cover (73% for Progression). Contact evidence alone is right on 92% of live frames there, so the tags would add noise rather than information. |
-| Smart Tagging set-piece windows as dead-ball evidence | Every window is exactly 35 s, the restart falls anywhere inside it, and only 59 set pieces are tagged against the 114 stoppages we find. We use them as an independent check instead (section 5). In our first version these windows were the dead-ball mask, and that was replaced. |
+| Smart Tagging set-piece windows as dead-ball evidence | Every window is exactly 35 s, the restart falls anywhere inside it, and only 59 set pieces are tagged against the 114 stoppages we find. We use them as an independent check instead (section 5). |
 | Unconstrained EM on all tables | It converges to the wrong states. Dead becomes "ball not tracked" in one variant and "players slow" in another, with 65% of frames dead. The anchors prevent this. |
-| "Ball not tracked for 10 s is dead" (first version) | Misses the 53 gaps of 5 to 10 s, and every stoppage with a visible ball. |
-| Majority vote of the nearest player (first version, starter baseline) | Counts the nearest player even when the ball is 10 m from anyone, and has no notion of a dead ball. Replaced by the HMM. |
-| Touchline proximity as a dead signal (first version) | Fired during live play along the touchline. Replaced by the stricter ball-out anchor, which needs a real excursion in distance and duration. |
 | Homography | The tracking is already in pitch coordinates. Not used. |
 | Broadcast tracking | On its own timeline with cuts and replays, and no mapping to the tactical frames. Not used. |
 | Video | Not used. We never checked the output against the video. |
@@ -211,17 +208,16 @@ All numbers below come from the official `run_evaluation.py` and from `solve.py`
 | | spellF1 | macroF1 | F1 H / A / D | alive/dead F1 | transition F1 (within 1 s) |
 |---|---|---|---|---|---|
 | This pipeline | 0.5517 | 0.9177 | 0.913 / 0.900 / 0.941 | 0.9859 | 0.457 |
-| Our first version | 0.5176 | 0.6655 | 0.761 / 0.841 / 0.395 | 0.8959 | 0.154 |
 
 The scorer's bootstrap interval for our spellF1 on this window is 0.36 to 0.73, and one
-possession moves it by about 0.06, so the spellF1 difference between the two rows means nothing.
-The frame-level columns are less noisy and do separate them. This window is only 7,500 frames and
-we used it as a check, so the full-match score may well be lower.
+possession moves it by about 0.06, so a single short possession swings it. The frame-level columns
+are far less noisy. This window is only 7,500 frames and we used it as a check, so the full-match
+score may well be lower.
 
 **An independent check over the full match.** Smart Tagging lists 59 set pieces. The model does
 not use them, apart from kick-offs, so they can test it, since a tagged set piece should contain a
 restart. Counting a Dead-to-alive transition between 10 s before the tag window and its end, our
-output has one for 53 of the 59 set pieces, and our first version had 42.
+output has one for 53 of the 59 set pieces.
 
 **Full-match output.** 241 possessions (mean 13.0 s) and 114 stoppages. Graded frames are 33%
 Home, 17% Away and 51% Dead. That is about 52 minutes of ball in play out of 106 graded, and a
